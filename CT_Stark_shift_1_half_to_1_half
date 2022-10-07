@@ -1,0 +1,101 @@
+{
+  "$schema": "http://docs.zhinst.com/hdawg/commandtable/v2/schema",
+  "header": {
+	"version": "0.2",
+	"UserString": "CT_Stark_shift_1_half_to_1_half",
+	"partial": true,
+	"description": "Command table for optimal AFC preperation"
+  },
+  "table": [
+	{
+	"index":0,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.0
+		}
+	},
+	{
+	"index":1,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.1111111111111111
+		}
+	},
+	{
+	"index":2,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.2222222222222222
+		}
+	},
+	{
+	"index":3,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.3333333333333333
+		}
+	},
+	{
+	"index":4,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.4444444444444444
+		}
+	},
+	{
+	"index":5,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.5555555555555556
+		}
+	},
+	{
+	"index":6,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.6666666666666666
+		}
+	},
+	{
+	"index":7,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.7777777777777777
+		}
+	},
+	{
+	"index":8,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 0.8888888888888888
+		}
+	},
+	{
+	"index":9,
+	  "waveform": {
+		  "index":0
+	  },
+	  "amplitude1": {
+		"value": 1.0
+		}
+	}
+  ]
+}

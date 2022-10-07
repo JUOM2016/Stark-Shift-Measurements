@@ -1,0 +1,118 @@
+{{
+const sampling_rate={sampling_rate}; // Hz; Sampling rate, should be the same as what you set on the right panel!
+
+
+const Number_of_burning_pulses = {Number_of_burning_pulses}; //Number of burning pulse repetitions  
+const Number_of_burning_back_pulses = {Number_of_burning_back_pulses}; //Number of burn-back pulse repetitions 
+cvar i;
+
+const centre_freq_burning={centre_freq_burning}; //Hz; Central frequency set to drive the AOM for burning 
+const chirpAmplitude_burning = {chirpAmplitude_burning};// V; amplitude of burning pulse 
+const freq_sweeping_burning={freq_sweeping_burning};//Hz; set the scanning frequency range of burning pulse (the actual scanning range should be 4*freq_detuning)
+const burning_duration={burning_duration}; //s; burning time 
+const startFreq_burning = (centre_freq_burning-freq_sweeping_burning)/sampling_rate;//Hz; starting frequency of the burning pulse 
+const stopFreq_burning = (centre_freq_burning+freq_sweeping_burning)/sampling_rate;//Hz; ending frequency of the burning pulse 
+const chirpSamples_burning = round(burning_duration*sampling_rate/16)*16;// Calculating sampling points 
+const phase = 0;
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+const centre_freq_burning_back={centre_freq_burning_back}; //Hz; Central frequency set to drive the AOM for burn-back
+
+const chirpAmplitude_burning_back = {chirpAmplitude_burning_back};// V; amplitude of burn-back
+const freq_sweeping_burning_back={freq_sweeping_burning_back};//Hz; set the scanning frequency range of burn-back (the actual scanning range should be 4*freq_detuning)
+const burning_back_duration={burning_back_duration}; //s; burning time burn-back
+const startFreq_burning_back = (centre_freq_burning_back-freq_sweeping_burning_back)/sampling_rate;//Hz; starting frequency of the burn-back
+const stopFreq_burning_back = (centre_freq_burning_back+freq_sweeping_burning_back)/sampling_rate;//Hz; ending frequency of the burn-back
+const chirpSamples_burning_back = round(burning_back_duration*sampling_rate/16)*16;// Calculating sampling points 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+const centre_freq_reading={centre_freq_reading};//Hz; Central frequency set to read out the burned spectral hole
+const chirpAmplitude_reading = {chirpAmplitude_reading};// V; amplitude of reading-out pulse
+const freq_sweeping_reading={freq_sweeping_reading};//Hz; set the scanning frequency range of reading-out pulse (the actual scanning range should be 4*freq_detuning) 1.32877326E6
+
+const reading_duration={reading_duration}; //s; reading-out time
+const startFreq_reading = (centre_freq_reading-freq_sweeping_reading)/sampling_rate;//Hz; starting frequency of the reading-out pulse
+const stopFreq_reading = (centre_freq_reading+freq_sweeping_reading)/sampling_rate;//Hz; ending frequency of the reading-out pulse
+//const stopFreq_reading = (centre_freq_reading-freq_detuning_reading)/sampling_rate;//Hz; stopping frequency of the reading-out pulse in opposite direction (from positive to negative)
+//const startFreq_reading = (centre_freq_reading+freq_detuning_reading)/sampling_rate;//Hz; ending frequency of the reading-out pulse in opposite direction (from positive to negative)
+const chirpSamples_reading = round(reading_duration*sampling_rate/16)*16;// Calculating sampling points 
+const rect_amplitude = {rect_amplitude}; //V; amplitude of rectangular pulse train
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const centre_freq_shuffle={centre_freq_shuffle};//Hz; Central frequency of the shuffle pulse
+
+const chirpAmplitude_shuffle = {chirpAmplitude_shuffle};// V; amplitude of shuffling pulse
+const freq_sweeping_shuffle={freq_sweeping_shuffle};//Hz; set the scanning frequency range of shuffling pulse
+const shuffle_duration={shuffle_duration};//s; shufling time
+const startFreq_shuffle = (centre_freq_shuffle-freq_sweeping_shuffle)/sampling_rate;//Hz; starting frequency of the shuffling pulse
+const stopFreq_shuffle = (centre_freq_shuffle+freq_sweeping_shuffle)/sampling_rate;//Hz; ending frequency of the shuffling pulse
+const chirpSamples_shuffle =round(shuffle_duration*sampling_rate/16)*16;// Calculating sampling points 
+
+wave marker_left=marker(chirpSamples_reading/2,0);
+wave marker_middle=marker(chirpSamples_reading/16,1);
+wave marker_right=marker(chirpSamples_reading/2, 0);
+wave w_marker=join(marker_left,marker_middle,marker_right);
+
+wave chirpedSine_burning_0 = chirpAmplitude_burning*chirp(chirpSamples_burning,1,startFreq_burning,stopFreq_burning, phase); //burning pulse with marker appended
+
+wave chirpedSine_burning   = chirpAmplitude_burning*chirp(chirpSamples_burning,1,startFreq_burning,stopFreq_burning, phase); //burning pulse without marker appended
+
+wave chirpedSine_burning_back = chirpAmplitude_burning_back*chirp(chirpSamples_burning_back,1,startFreq_burning_back,stopFreq_burning_back, phase); //burnback pulse 
+
+wave chirpedSine_reading = chirpAmplitude_reading*chirp(chirpSamples_reading,1,startFreq_reading,stopFreq_reading, phase)+w_marker; //read-out pulse
+wave w_flat = rect(chirpSamples_reading, rect_amplitude);
+
+wave chirpedSine_shuffle = chirpAmplitude_shuffle*chirp(chirpSamples_shuffle,1,startFreq_shuffle,stopFreq_shuffle, phase); //shuffle pulse
+
+//setTrigger(0);
+
+const delay_00 = 0.3E-3; //s; time delay between repeated burning pulses 
+const sample_delay_00=round(delay_00*sampling_rate/16)*16;
+
+playWave(chirpedSine_burning_0);
+playZero(sample_delay_00);
+
+for (i = 0; i < Number_of_burning_back_pulses; i++) {{
+  playWave(chirpedSine_burning);
+  playZero(sample_delay_00);
+}}
+
+const delay_01=0.3E-3; //s; time delay between the burning pulses and burn-back
+const sample_delay_01=round(delay_01*sampling_rate/16)*16;
+playZero(sample_delay_01);
+
+const delay_02 = 0.3E-3; //s; time delay between repeated burn-back pulses
+const sample_delay_02=round(delay_02*sampling_rate/16)*16;
+
+for (i = 0; i < Number_of_burning_back_pulses; i++) {{
+  playWave(chirpedSine_burning_back);
+  playZero(sample_delay_02);
+}}
+
+const delay_05=1E-3; //s; time delay between the clean and read-out pulses (also, between burn and read-out when testing with no burn-back and clean)
+const sample_delay_05=round(delay_05*sampling_rate/16)*16;
+playZero(sample_delay_05);
+
+//setTrigger(1);
+
+//playWave(2,w_flat);
+//playZero(chirpSamples_burning_back*0.1);
+//playWave(1,chirpedSine_reading);
+playWave(chirpedSine_reading,w_flat);
+//playWave(1,chirpedSine_reading);
+//playWave(2,w_flat);
+//playWave(1,chirpedSine_reading,2,w_flat);
+
+const delay_06=20E-3;//s; time delay between the read-out pulse and shuffle pulse
+const sample_delay_06=round(delay_06*sampling_rate/16)*16;
+playZero(sample_delay_06);
+
+//setTrigger(0);
+
+playWave(chirpedSine_shuffle);
+
+const delay_07=40E-3;//s; time delay between the shuffle pulse and burning pulse
+const sample_delay_07=round(delay_07*sampling_rate/16)*16;
+playZero(sample_delay_07);
+
+
+}}
