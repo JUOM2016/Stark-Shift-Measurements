@@ -1,5 +1,6 @@
 import zhinst.utils as zu
 import numpy as np
+import os
 from scipy.signal import chirp
 from measurements.libs.QPLser.AWGmanager import HDAWG_PLser
 
